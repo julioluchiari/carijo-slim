@@ -1,18 +1,13 @@
 import pool from "./database.js";
 import express from "express";
+import health from "./handlers/health.handler.js";
+import getBankStatement from "./handlers/bank-statement.handler.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get('/', async (req, res) => {
-    try {
-        const { rows } = await pool.query('SELECT NOW()');
-        res.json({ currentTime: rows[0].now });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Erro ao acessar o banco de dados');
-    }
-});
+app.get('/health', health);
+app.get('/clientes/:accountId/extrato', getBankStatement);
 
 const server = app.listen(PORT, () => {
     console.log(`server running at ${PORT}`);
