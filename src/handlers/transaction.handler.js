@@ -24,11 +24,12 @@ export default async function createTransaction (req, res, next) {
     }
 
     const transactionAmount = parseInt(req.body.valor);
+    const client = await pool.connect();
 
     try {
-        await pool.query('BEGIN')
+        await client.query('BEGIN')
 
-        const { rows } = await pool.query(`
+        const { rows } = await client.query(`
             SELECT a.id, b.amount, a.limit_amount, b.id as balance_id
             FROM accounts a
             INNER JOIN balances b ON a.id = b.account_id
@@ -37,6 +38,7 @@ export default async function createTransaction (req, res, next) {
         `, [accountId]);
 
         if (!rows || rows.length === 0) {
+            await client.query('ROLLBACK');
             return res.status(404).send();
         }
 
@@ -48,29 +50,32 @@ export default async function createTransaction (req, res, next) {
                 : amount - transactionAmount;
 
         if (newAmount < rows[0]['limit_amount'] * -1) {
+            await client.query('ROLLBACK');
             return res.status(422).send();
         }
 
-        await pool.query(`
+        await client.query(`
             INSERT INTO transactions (amount, type, description, account_id)
             VALUES ($1, $2, $3, $4)
         `, [transactionAmount, req.body.tipo, req.body.descricao, accountId]);
 
-        await pool.query(`
+        await client.query(`
             UPDATE balances
             SET amount = $1
             WHERE id = $2
         `, [newAmount, rows[0]['balance_id']]);
 
-        await pool.query('COMMIT');
+        await client.query('COMMIT');
 
         return res.status(200).json({
-            limite: rows['limit_amount'],
+            limite: rows[0]['limit_amount'],
             saldo: newAmount,
         });
     } catch (error) {
-        await pool.query('ROLLBACK');
+        await client.query('ROLLBACK');
         console.error('error creating transaction', error);
         next(error);
+    } finally {
+        client.release();
     }
 }

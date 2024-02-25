@@ -7,6 +7,8 @@ export default async function getBankStatement(req, res, next) {
         return res.status(400).send();
     }
 
+    const client = await pool.connect();
+
     try {
         const query = `
             SELECT a.limit_amount, b.amount as b_amount, t.amount as t_amount, t.type, t.created_at, t.description
@@ -18,7 +20,7 @@ export default async function getBankStatement(req, res, next) {
             LIMIT 10
         `;
 
-        const { rows } = await pool.query(query, [accountId]);
+        const { rows } = await client.query(query, [accountId]);
 
         if (!rows || rows.length === 0) {
             console.log('here');
@@ -47,5 +49,7 @@ export default async function getBankStatement(req, res, next) {
     } catch (error) {
         console.error('error fetching bank statement', error);
         next(error);
+    } finally {
+        client.release();
     }
 }

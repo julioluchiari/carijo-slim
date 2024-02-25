@@ -6,7 +6,7 @@ const pool = new Pool({
     host: process.env.DB_HOST || 'localhost',
     database: process.env.DB_NAME || 'rinha',
     password: process.env.DB_PASS || '123',
-    port: process.env.PORT || 5432,
+    port: process.env.DB_PORT || 5432,
     max: process.env.DB_POOL_SIZE || 10,
 });
 
