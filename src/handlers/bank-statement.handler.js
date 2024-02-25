@@ -1,15 +1,13 @@
 import pool from "../database.js"
 
-export default async function getBankStatement(req, res) {
+export default async function getBankStatement(req, res, next) {
+    const { accountId } = req.params;
+
+    if (!parseInt(accountId) > 0) {
+        return res.status(400).send();
+    }
+
     try {
-        const { accountId } = req.params;
-
-        console.log('accountId', accountId)
-
-        if (!parseInt(accountId) > 0) {
-            return res.status(400).send();
-        }
-
         const query = `
             SELECT a.limit_amount, b.amount as b_amount, t.amount as t_amount, t.type, t.created_at, t.description
             FROM accounts a
@@ -48,6 +46,6 @@ export default async function getBankStatement(req, res) {
         return res.status(200).json(response);
     } catch (error) {
         console.error('error fetching bank statement', error);
-        return res.status(500).send();
+        next(error);
     }
 }
