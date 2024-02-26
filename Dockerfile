@@ -4,8 +4,7 @@ WORKDIR /app
 
 COPY --chown=node:node package*.json ./
 
-RUN npm install -g @babel/cli @babel/core @babel/preset-env
-RUN npm ci --omit=dev
+RUN npm ci
 
 COPY --chown=node:node . .
 
