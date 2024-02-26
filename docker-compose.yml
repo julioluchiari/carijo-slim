@@ -22,5 +22,5 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.5"
-          memory: "550MB"
+          cpus: "0.5"
+          memory: "200MB"
