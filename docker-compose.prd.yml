@@ -2,7 +2,7 @@ version: "3.5"
 
 services:
   api01: &api
-    image: julioluchiari/carijo-slim:v0.0.1
+    image: julioluchiari/carijo-slim:latest
 #    build: .
     environment:
       - DB_HOST=db

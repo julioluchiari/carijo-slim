@@ -32,4 +32,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: julioluchiari/carijo-slim:${{ steps.determine-tag.outputs.tag }}
+          tags: |
+            julioluchiari/carijo-slim:${{ steps.determine-tag.outputs.tag }}
+            julioluchiari/carijo-slim:latest
