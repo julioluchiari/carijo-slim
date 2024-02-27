@@ -25,4 +25,7 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
 
       - name: Build
-        run: npm ci
+        run: npm install
+
+      - name: E2E tests
+        run: make test-e2e
