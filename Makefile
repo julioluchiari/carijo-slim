@@ -1,6 +1,9 @@
 help:
 	@echo "install - install npm packages"
 	@echo "start - start the server"
+	@echo "lint - run prettier"
+	@echo "lint-fix - run prettier and fix the issues"
+	@echo "test-e2e - run the end to end tests"
 	@echo "health - check the health of the server"
 	@echo "docker-stats - check the stats of the docker containers"
 	@echo "docker-up - start the docker containers"
@@ -17,6 +20,15 @@ install:
 
 start:
 	npm start
+
+lint:
+	npm run lint
+
+lint-fix:
+	npm run lint:fix
+
+test-e2e: docker-restart
+	npm run test
 
 health:
 	curl http://localhost:3000/health

@@ -3,7 +3,7 @@ const { pool } = require("../database.js");
 const transactionTypes = ["c", "d"];
 
 async function createTransaction(req, res, next) {
-  const accountId = parseInt(req.params['accountId']);
+  const accountId = parseInt(req.params["accountId"]);
 
   if (!accountId > 0) {
     return res.status(400).send();
