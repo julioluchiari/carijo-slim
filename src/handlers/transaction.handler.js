@@ -3,11 +3,9 @@ const { pool } = require("../database.js");
 const transactionTypes = ["c", "d"];
 
 async function createTransaction(req, res, next) {
-  const { accountId } = req.params;
+  const accountId = parseInt(req.params['accountId']);
 
-  console.log(JSON.stringify(req.body));
-
-  if (!parseInt(accountId) > 0) {
+  if (!accountId > 0) {
     return res.status(400).send();
   }
 
@@ -36,9 +34,8 @@ async function createTransaction(req, res, next) {
 
     const { rows } = await client.query(
       `
-            SELECT a.id, b.amount, a.limit_amount, b.id as balance_id
+            SELECT a.id, a.balance, a.limit_amount
             FROM accounts a
-            INNER JOIN balances b ON a.id = b.account_id
             WHERE a.id = $1
             FOR UPDATE
         `,
@@ -46,11 +43,10 @@ async function createTransaction(req, res, next) {
     );
 
     if (!rows || rows.length === 0) {
-      await client.query("ROLLBACK");
       return res.status(404).send();
     }
 
-    const amount = rows[0]["amount"];
+    const amount = rows[0]["balance"];
 
     const newAmount =
       req.body.tipo === "c"
@@ -72,11 +68,11 @@ async function createTransaction(req, res, next) {
 
     await client.query(
       `
-            UPDATE balances
-            SET amount = $1
+            UPDATE accounts
+            SET balance = $1
             WHERE id = $2
         `,
-      [newAmount, rows[0]["balance_id"]],
+      [newAmount, rows[0]["id"]],
     );
 
     await client.query("COMMIT");
@@ -87,7 +83,6 @@ async function createTransaction(req, res, next) {
     });
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error("error creating transaction", error);
     next(error);
   } finally {
     client.release();

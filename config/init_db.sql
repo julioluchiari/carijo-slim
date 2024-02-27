@@ -1,14 +1,8 @@
 CREATE TABLE accounts (
     id SERIAL PRIMARY KEY,
     name VARCHAR(30) NOT NULL,
-    limit_amount INTEGER NOT NULL
-);
-
-CREATE TABLE balances (
-    id SERIAL PRIMARY KEY,
-    account_id INTEGER NOT NULL,
-    amount INTEGER NOT NULL,
-    CONSTRAINT fk_customers_balances FOREIGN KEY (account_id) REFERENCES accounts(id)
+    limit_amount INTEGER NOT NULL,
+    balance INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE transactions (
@@ -30,7 +24,4 @@ BEGIN
         ('les cruders', 10000 * 100),
         ('padaria joia de cocaia', 100000 * 100),
         ('kid mais', 5000 * 100);
-
-    INSERT INTO balances (account_id, amount)
-    SELECT id, 0 FROM accounts;
 END; $$
