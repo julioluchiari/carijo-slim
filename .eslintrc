@@ -2,5 +2,13 @@
   "env": {
     "node": true
   },
-  "rules": {}
+  "rules": {
+    "prettier/prettier": "error"
+  },
+  "extends": [
+    "prettier"
+  ],
+  "plugins": [
+    "prettier"
+  ]
 }
