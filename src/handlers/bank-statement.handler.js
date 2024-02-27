@@ -1,16 +1,16 @@
-import pool from "../database.js"
+const { pool } = require("../database.js");
 
-export default async function getBankStatement(req, res, next) {
-    const { accountId } = req.params;
+async function getBankStatement(req, res, next) {
+  const { accountId } = req.params;
 
-    if (!parseInt(accountId) > 0) {
-        return res.status(400).send();
-    }
+  if (!parseInt(accountId) > 0) {
+    return res.status(400).send();
+  }
 
-    const client = await pool.connect();
+  const client = await pool.connect();
 
-    try {
-        const query = `
+  try {
+    const query = `
             SELECT a.limit_amount, b.amount as b_amount, t.amount as t_amount, t.type, t.created_at, t.description
             FROM accounts a
             INNER JOIN balances b ON a.id = b.account_id
@@ -20,36 +20,40 @@ export default async function getBankStatement(req, res, next) {
             LIMIT 10
         `;
 
-        const { rows } = await client.query(query, [accountId]);
+    const { rows } = await client.query(query, [accountId]);
 
-        if (!rows || rows.length === 0) {
-            console.log('here');
-            return res.status(404).json({ status: 'not found' });
-        }
-
-        const now = new Date();
-
-        const existsTransactions = rows.some((row) => row['t_amount'] !== null);
-
-        const response = {
-            saldo: {
-                total: rows[0]['b_amount'],
-                data_extrato: now.toISOString(),
-                limite: rows[0]['limit_amount'],
-            },
-            ultimas_transacoes: existsTransactions ? rows.map((row) => ({
-                valor: row['t_amount'],
-                tipo: row['type'],
-                descricao: row['description'],
-                realizada_em: row['created_at'],
-            })) : [],
-        }
-
-        return res.status(200).json(response);
-    } catch (error) {
-        console.error('error fetching bank statement', error);
-        next(error);
-    } finally {
-        client.release();
+    if (!rows || rows.length === 0) {
+      console.log("here");
+      return res.status(404).json({ status: "not found" });
     }
+
+    const now = new Date();
+
+    const existsTransactions = rows.some((row) => row["t_amount"] !== null);
+
+    const response = {
+      saldo: {
+        total: rows[0]["b_amount"],
+        data_extrato: now.toISOString(),
+        limite: rows[0]["limit_amount"],
+      },
+      ultimas_transacoes: existsTransactions
+        ? rows.map((row) => ({
+            valor: row["t_amount"],
+            tipo: row["type"],
+            descricao: row["description"],
+            realizada_em: row["created_at"],
+          }))
+        : [],
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("error fetching bank statement", error);
+    next(error);
+  } finally {
+    client.release();
+  }
 }
+
+module.exports = { getBankStatement };
