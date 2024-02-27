@@ -1,8 +1,25 @@
+help:
+	@echo "install - install npm packages"
+	@echo "start - start the server"
+	@echo "health - check the health of the server"
+	@echo "docker-stats - check the stats of the docker containers"
+	@echo "docker-up - start the docker containers"
+	@echo "docker-down - stop the docker containers"
+	@echo "docker-restart - run up and down for the docker containers"
+	@echo "prd/docker-build - build the docker containers for production"
+	@echo "prd/docker-up - start the docker containers for production"
+	@echo "prd/docker-down - stop the docker containers for production"
+	@echo "prd/docker-restart - run up and down for the docker containers for production"
+	@echo "stress-test - run the stress test"
+
 install:
 	npm install
 
 start:
 	npm start
+
+health:
+	curl http://localhost:3000/health
 
 docker-stats:
 	docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"
