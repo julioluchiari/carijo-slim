@@ -1,6 +1,6 @@
 ## Carijó Slim
 
-Um modesto competidor muito para a [Rinha de Backend - 2024/Q1]().
+Um modesto competidor muito para a [Rinha de Backend - 2024/Q1](https://github.com/zanfranceschi/rinha-de-backend-2024-q1).
 
 PS: O sufixo `slim` existe porque tentei fazer com NestJS e TypeORM e não deu muito certo.
 
