@@ -1,9 +1,9 @@
 const { pool } = require("../database.js");
 
 async function getBankStatement(req, res, next) {
-  const { accountId } = req.params;
+  const accountId = parseInt(req.params['accountId']);
 
-  if (!parseInt(accountId) > 0) {
+  if (!accountId > 0) {
     return res.status(400).send();
   }
 
@@ -11,9 +11,8 @@ async function getBankStatement(req, res, next) {
 
   try {
     const query = `
-            SELECT a.limit_amount, b.amount as b_amount, t.amount as t_amount, t.type, t.created_at, t.description
+            SELECT a.limit_amount, a.balance as b_amount, t.amount as t_amount, t.type, t.created_at, t.description
             FROM accounts a
-            INNER JOIN balances b ON a.id = b.account_id
             LEFT JOIN transactions t ON a.id = t.account_id
             WHERE a.id = $1
             ORDER BY t.created_at DESC
@@ -23,7 +22,6 @@ async function getBankStatement(req, res, next) {
     const { rows } = await client.query(query, [accountId]);
 
     if (!rows || rows.length === 0) {
-      console.log("here");
       return res.status(404).json({ status: "not found" });
     }
 
@@ -49,7 +47,6 @@ async function getBankStatement(req, res, next) {
 
     return res.status(200).json(response);
   } catch (error) {
-    console.error("error fetching bank statement", error);
     next(error);
   } finally {
     client.release();
